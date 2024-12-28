@@ -6,7 +6,7 @@ const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const socialLinks = [
-    { name: 'GitHub', url: 'https://github.com/kaustubh2020', icon: '💻' },
+    { name: 'GitHub', url: 'https://github.com/kaustubh2020/pokedex-neobrutalism-design', icon: '💻' },
     { name: 'Portfolio', url: 'https://kaustubh-folio.netlify.app/', icon: '👑' },
   ];
 
