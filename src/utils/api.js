@@ -17,10 +17,23 @@ export const getPokemonDetails = async (id) => {
   return await fetchData(`${BASE_URL}/pokemon/${id}`);
 };
 
-/* export const getPokemonSpecies = async (id) => {
+export const getPokemonSpecies = async (id) => {
   return await fetchData(`${BASE_URL}/pokemon-species/${id}`);
-}; */
+};
 
-/* export const getEvolutionChain = async (url) => {
-  return await fetchData(url);
-}; */
+const evolutionCache = new Map();
+
+export const getEvolutionChain = async (url) => {
+  if (evolutionCache.has(url)) {
+    return evolutionCache.get(url);
+  }
+
+  try {
+    const data = await fetchData(url);
+    evolutionCache.set(url, data);
+    return data;
+  } catch (error) {
+    console.error("Error fetching evolution chain:", error);
+    throw error;
+  }
+};

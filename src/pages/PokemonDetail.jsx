@@ -4,7 +4,7 @@ import { motion } from "motion/react"
 import { typeColors } from '../utils/typeColors';
 import { getPokemonDetails } from '../utils/api';
 import Loading from '../components/ui/Loading';
-/* import EvolutionChain from '../components/pokemon/EvolutionChain'; */
+import EvolutionChain from '../components/pokemon/EvolutionChain';
 
 const PokemonDetail = () => {
   const { id } = useParams();
@@ -125,7 +125,7 @@ const PokemonDetail = () => {
           </div>
         </div>
 
-        {/* <EvolutionChain pokemonId={pokemon.id} /> */}
+        <EvolutionChain pokemonId={pokemon.id} />
       </div>
     </motion.div>
   );

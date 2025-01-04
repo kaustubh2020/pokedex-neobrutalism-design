@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import {
   getPokemonDetails,
-  /* getPokemonSpecies,
-  getEvolutionChain, */
+  getPokemonSpecies,
+  getEvolutionChain,
 } from "../utils/api";
 import { pokemonList } from "../data/pokemonList";
 
@@ -30,18 +30,18 @@ export const usePokemon = () => {
         const details = await getPokemonDetails(id);
 
         // Fetch species data
-        /* const species = await getPokemonSpecies(id); */
+        const species = await getPokemonSpecies(id);
 
         // Fetch evolution chain
-        /* const evolutionData = await getEvolutionChain(
+        const evolutionData = await getEvolutionChain(
           species.evolution_chain.url
-        ); */
+        );
 
         // Combine all data
         const completeData = {
           ...details,
-          /* species, */
-          /* evolutionChain: evolutionData, */
+          species,
+          evolutionChain: evolutionData,
         };
 
         // Update pokemon array while preventing duplicates
