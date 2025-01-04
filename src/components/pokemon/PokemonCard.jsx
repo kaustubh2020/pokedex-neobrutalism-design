@@ -1,9 +1,10 @@
+import { memo } from 'react';
 import PropTypes from 'prop-types';
 import { motion } from "motion/react";
 import { Link } from "react-router-dom";
 import { typeColors } from "../../utils/typeColors";
 
-const PokemonCard = ({ pokemon }) => {
+const PokemonCard = memo(({ pokemon }) => {
   const mainType = pokemon.types[0].type.name;
   const colors = typeColors[mainType];
 
@@ -53,7 +54,7 @@ const PokemonCard = ({ pokemon }) => {
       </Link>
     </motion.div>
   );
-};
+});
 
 PokemonCard.propTypes = {
   pokemon: PropTypes.shape({
@@ -75,5 +76,7 @@ PokemonCard.propTypes = {
     }).isRequired,
   }).isRequired,
 };
+
+PokemonCard.displayName = 'PokemonCard';
 
 export default PokemonCard;
