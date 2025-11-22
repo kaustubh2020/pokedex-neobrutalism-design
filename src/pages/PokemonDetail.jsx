@@ -4,7 +4,6 @@ import { motion, AnimatePresence } from "motion/react";
 import { typeColors } from '../utils/typeColors';
 import { getPokemonDetails } from '../utils/api';
 import Loading from '../components/ui/Loading';
-import Breadcrumbs from '../components/ui/Breadcrumbs';
 import ShareButton from '../components/ui/ShareButton';
 import EvolutionChain from '../components/pokemon/EvolutionChain';
 import PokemonMoves from '../components/pokemon/PokemonMoves';
@@ -48,13 +47,6 @@ const PokemonDetail = () => {
       className="max-w-4xl mx-auto px-4 py-8"
     >
       <div className="neo-card p-8" style={{ backgroundColor: colors.highlight }}>
-        <Breadcrumbs
-          items={[
-            { label: 'Home', href: '/' },
-            { label: 'Pokémon', href: '/' },
-            { label: `#${String(pokemon.id).padStart(3, '0')} ${pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1)}` },
-          ]}
-        />
 
         <div className="flex justify-between items-center mb-6">
           <motion.button
