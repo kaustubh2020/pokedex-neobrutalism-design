@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   getPokemonDetails,
   getPokemonSpecies,
@@ -6,67 +6,98 @@ import {
 } from "../utils/api";
 import { pokemonList } from "../data/pokemonList";
 
+const BATCH_SIZE = 20;
+
 export const usePokemon = () => {
   const [pokemon, setPokemon] = useState([]);
   const [error, setError] = useState(null);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
 
-  useEffect(() => {
-    const fetchPokemonData = async () => {
-      if (currentIndex >= pokemonList.length) {
-        return;
-      }
+  const fetchBatch = useCallback(async () => {
+    if (currentIndex >= pokemonList.length || isLoading) {
+      setHasMore(false);
+      return;
+    }
 
-      try {
-        const id = pokemonList[currentIndex].url.split("/")[6];
+    setIsLoading(true);
 
-        // First check if this pokemon is already in the array
+    try {
+      const endIndex = Math.min(currentIndex + BATCH_SIZE, pokemonList.length);
+      const batch = pokemonList.slice(currentIndex, endIndex);
+
+      const pokemonPromises = batch.map(async (item) => {
+        const id = item.url.split("/")[6];
+
+        // Check if already loaded
         if (pokemon.some((p) => p.id === parseInt(id))) {
-          setCurrentIndex((prev) => prev + 1);
-          return;
+          return null;
         }
 
-        // Fetch pokemon details
-        const details = await getPokemonDetails(id);
+        try {
+          // Fetch pokemon details
+          const details = await getPokemonDetails(id);
 
-        // Fetch species data
-        const species = await getPokemonSpecies(id);
+          // Fetch species data
+          const species = await getPokemonSpecies(id);
 
-        // Fetch evolution chain
-        const evolutionData = await getEvolutionChain(
-          species.evolution_chain.url
+          // Fetch evolution chain
+          const evolutionData = await getEvolutionChain(
+            species.evolution_chain.url
+          );
+
+          return {
+            ...details,
+            species,
+            evolutionChain: evolutionData,
+          };
+        } catch (err) {
+          console.error(`Error fetching Pokemon ${id}:`, err);
+          return null;
+        }
+      });
+
+      const results = await Promise.all(pokemonPromises);
+      const validResults = results.filter((p) => p !== null);
+
+      setPokemon((prev) => {
+        // Prevent duplicates
+        const newPokemon = validResults.filter(
+          (newP) => !prev.some((p) => p.id === newP.id)
         );
+        return [...prev, ...newPokemon];
+      });
 
-        // Combine all data
-        const completeData = {
-          ...details,
-          species,
-          evolutionChain: evolutionData,
-        };
+      setCurrentIndex(endIndex);
+      setHasMore(endIndex < pokemonList.length);
+    } catch (err) {
+      setError(err);
+      console.error("Error fetching Pokemon batch:", err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [currentIndex, pokemon, isLoading]);
 
-        // Update pokemon array while preventing duplicates
-        setPokemon((prev) => {
-          if (prev.some((p) => p.id === completeData.id)) {
-            return prev;
-          }
-          return [...prev, completeData];
-        });
+  // Load initial batch
+  useEffect(() => {
+    if (pokemon.length === 0 && !isLoading) {
+      fetchBatch();
+    }
+  }, []);
 
-        // Move to next pokemon
-        setCurrentIndex((prev) => prev + 1);
-      } catch (err) {
-        setError(err);
-        console.error("Error fetching Pokemon:", err);
-      }
-    };
-
-    fetchPokemonData();
-  }, [currentIndex, pokemon]);
+  const loadMore = useCallback(() => {
+    if (!isLoading && hasMore) {
+      fetchBatch();
+    }
+  }, [isLoading, hasMore, fetchBatch]);
 
   return {
     pokemon,
-    loading: currentIndex < pokemonList.length,
+    loading: isLoading,
     error,
     progress: (currentIndex / pokemonList.length) * 100,
+    hasMore,
+    loadMore,
   };
 };

@@ -4,14 +4,20 @@ import { motion, AnimatePresence } from "motion/react";
 import { typeColors } from '../utils/typeColors';
 import { getPokemonDetails } from '../utils/api';
 import Loading from '../components/ui/Loading';
+import Breadcrumbs from '../components/ui/Breadcrumbs';
+import ShareButton from '../components/ui/ShareButton';
 import EvolutionChain from '../components/pokemon/EvolutionChain';
 import PokemonMoves from '../components/pokemon/PokemonMoves';
+import TypeEffectiveness from '../components/pokemon/TypeEffectiveness';
+import PokemonDescription from '../components/pokemon/PokemonDescription';
+import ShinyToggle, { ShinySprite } from '../components/pokemon/ShinyToggle';
 
 const PokemonDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [pokemon, setPokemon] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isShiny, setIsShiny] = useState(false);
 
   useEffect(() => {
     const fetchPokemon = async () => {
@@ -32,36 +38,59 @@ const PokemonDetail = () => {
 
   const mainType = pokemon.types[0].type.name;
   const colors = typeColors[mainType];
+  const pokemonTypes = pokemon.types.map(t => t.type.name);
 
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="max-w-4xl mx-auto"
+      className="max-w-4xl mx-auto px-4 py-8"
     >
       <div className="neo-card p-8" style={{ backgroundColor: colors.highlight }}>
-        <motion.button
-          whileHover={{ scale: 1.01 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={() => navigate('/')}
-          className="neo-button mb-6"
-        >
-          ← Back to List
-        </motion.button>
+        <Breadcrumbs
+          items={[
+            { label: 'Home', href: '/' },
+            { label: 'Pokémon', href: '/' },
+            { label: `#${String(pokemon.id).padStart(3, '0')} ${pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1)}` },
+          ]}
+        />
+
+        <div className="flex justify-between items-center mb-6">
+          <motion.button
+            whileHover={{ scale: 1.01 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => navigate('/')}
+            className="neo-button"
+          >
+            ← Back to List
+          </motion.button>
+
+          <ShareButton
+            title={`${pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1)} #${String(pokemon.id).padStart(3, '0')} - Pokédex`}
+            description={`Check out ${pokemon.name} in the Pokédex!`}
+          />
+        </div>
 
         <div className="grid md:grid-cols-2 gap-8">
-          <div
-            className="neo-card p-4 bg-neo-white rounded-tl-3xl"
-          >
-            <motion.img
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ delay: 0.2 }}
-              src={pokemon.sprites.other['official-artwork'].front_default}
-              alt={pokemon.name}
-              className="w-full h-auto"
-            />
+          <div>
+            <div className="neo-card p-4 bg-neo-white rounded-tl-3xl">
+              <ShinySprite
+                normalSprite={pokemon.sprites.other['official-artwork'].front_default}
+                shinySprite={pokemon.sprites.other['official-artwork'].front_shiny}
+                isShiny={isShiny}
+                pokemonName={pokemon.name}
+              />
+            </div>
+
+            <div className="mt-4 flex justify-center">
+              <ShinyToggle
+                normalSprite={pokemon.sprites.other['official-artwork'].front_default}
+                shinySprite={pokemon.sprites.other['official-artwork'].front_shiny}
+                pokemonName={pokemon.name}
+                onToggle={setIsShiny}
+              />
+            </div>
           </div>
 
           <div className="space-y-6">
@@ -184,6 +213,8 @@ const PokemonDetail = () => {
           </div>
         </div>
 
+        <PokemonDescription species={pokemon.species} />
+        <TypeEffectiveness types={pokemonTypes} />
         <EvolutionChain pokemonId={pokemon.id} />
         <PokemonMoves pokemon={pokemon} />
       </div>

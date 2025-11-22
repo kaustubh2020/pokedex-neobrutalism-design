@@ -22,3 +22,38 @@
 body {
   @apply bg-neo-yellow min-h-screen;
 }
+
+/* Focus Indicators for Accessibility */
+*:focus-visible {
+  @apply outline-4 outline-offset-2 outline-neo-black;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible {
+  @apply ring-4 ring-neo-blue ring-offset-2;
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Lazy Loading Images */
+img[loading="lazy"] {
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+img[loading="lazy"].loaded,
+img[loading="lazy"]:not([src]) {
+  opacity: 1;
+}
+

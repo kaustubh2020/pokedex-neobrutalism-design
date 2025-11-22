@@ -1,11 +1,14 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from "motion/react";
+import InfiniteScroll from 'react-infinite-scroll-component';
 import { usePokemon } from '../../hooks/usePokemon';
 import PokemonCard from './PokemonCard';
 import TypeFilter from '../ui/TypeFilter';
+import { SkeletonGrid } from '../ui/SkeletonCard';
+import EmptyState from '../ui/EmptyState';
 
 const PokemonGrid = () => {
-  const { pokemon, loading, progress } = usePokemon();
+  const { pokemon, loading, hasMore, loadMore } = usePokemon();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedTypes, setSelectedTypes] = useState([]);
 
@@ -19,6 +22,7 @@ const PokemonGrid = () => {
 
   const handleClearFilters = () => {
     setSelectedTypes([]);
+    setSearchTerm('');
   };
 
   const filteredPokemon = pokemon.filter(p => {
@@ -32,6 +36,9 @@ const PokemonGrid = () => {
 
     return matchesSearch && matchesType;
   });
+
+  const hasFilters = searchTerm || selectedTypes.length > 0;
+  const showEmptyState = !loading && filteredPokemon.length === 0 && hasFilters;
 
   return (
     <div className="max-w-7xl mx-auto">
@@ -50,6 +57,7 @@ const PokemonGrid = () => {
         <input
           type="text"
           placeholder="Search Pokémon by name or ID..."
+          value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="neo-input"
         />
@@ -61,39 +69,54 @@ const PokemonGrid = () => {
         onClearFilters={handleClearFilters}
       />
 
-      {loading && (
-        <motion.div
-          className="my-8"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-        >
-          <div className="w-full h-4 bg-neo-white border-2 border-neo-black rounded-full overflow-hidden">
+      {showEmptyState ? (
+        <EmptyState
+          icon="🔍"
+          title="No Pokémon Found"
+          message="Try adjusting your filters or search term to find what you're looking for."
+          onClearFilters={handleClearFilters}
+          showClearButton={hasFilters}
+        />
+      ) : (
+        <InfiniteScroll
+          dataLength={filteredPokemon.length}
+          next={loadMore}
+          hasMore={hasMore && !hasFilters}
+          loader={<SkeletonGrid count={4} />}
+          endMessage={
             <motion.div
-              className="h-full bg-neo-pink"
-              initial={{ width: 0 }}
-              animate={{ width: `${progress}%` }}
-              transition={{ type: "spring", stiffness: 50 }}
-            />
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-center py-8"
+            >
+              <p className="text-xl font-bold">
+                🎉 You've seen all {filteredPokemon.length} Pokémon!
+              </p>
+            </motion.div>
+          }
+        >
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 mt-8">
+            <AnimatePresence>
+              {filteredPokemon.map((pokemon, index) => (
+                <motion.div
+                  key={`pokemon-${pokemon.id}`}
+                  initial={{ opacity: 0, y: 50 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -50 }}
+                  transition={{ type: "spring", stiffness: 100 }}
+                >
+                  <PokemonCard pokemon={pokemon} />
+                </motion.div>
+              ))}
+            </AnimatePresence>
           </div>
-          <p className="text-center mt-2">Loading Pokémons: {Math.round(progress)}%</p>
-        </motion.div>
+        </InfiniteScroll>
       )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 mt-8">
-        <AnimatePresence>
-          {filteredPokemon.map((pokemon, index) => (
-            <motion.div
-              key={`pokemon-${index}`}
-              initial={{ opacity: 0, y: 50 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -50 }}
-              transition={{ type: "spring", stiffness: 100 }}
-            >
-              <PokemonCard pokemon={pokemon} />
-            </motion.div>
-          ))}
-        </AnimatePresence>
-      </div>
+      {/* Initial Loading State */}
+      {pokemon.length === 0 && loading && (
+        <SkeletonGrid count={8} />
+      )}
     </div>
   );
 };

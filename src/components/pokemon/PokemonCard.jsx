@@ -64,7 +64,7 @@ const PokemonCard = memo(({ pokemon }) => {
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
-              className="absolute top-2 right-2 bg-neo-yellow border-2 border-neo-black px-2 py-1 text-xs font-bold shadow-neo"
+              className="absolute top-2 right-2 border-2 border-neo-black px-2 py-1 text-xs font-bold shadow-neo"
             >
               {statIcons[highestStat.stat.name]} {highestStat.base_stat}
             </motion.div>
