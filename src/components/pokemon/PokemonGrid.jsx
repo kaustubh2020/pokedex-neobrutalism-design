@@ -2,15 +2,36 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from "motion/react";
 import { usePokemon } from '../../hooks/usePokemon';
 import PokemonCard from './PokemonCard';
+import TypeFilter from '../ui/TypeFilter';
 
 const PokemonGrid = () => {
   const { pokemon, loading, progress } = usePokemon();
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedTypes, setSelectedTypes] = useState([]);
 
-  const filteredPokemon = pokemon.filter(p =>
-    p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    p.id.toString().includes(searchTerm)
-  );
+  const handleTypeToggle = (type) => {
+    setSelectedTypes(prev =>
+      prev.includes(type)
+        ? prev.filter(t => t !== type)
+        : [...prev, type]
+    );
+  };
+
+  const handleClearFilters = () => {
+    setSelectedTypes([]);
+  };
+
+  const filteredPokemon = pokemon.filter(p => {
+    // Search filter
+    const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      p.id.toString().includes(searchTerm);
+
+    // Type filter
+    const matchesType = selectedTypes.length === 0 ||
+      p.types.some(({ type }) => selectedTypes.includes(type.name));
+
+    return matchesSearch && matchesType;
+  });
 
   return (
     <div className="max-w-7xl mx-auto">
@@ -33,6 +54,12 @@ const PokemonGrid = () => {
           className="neo-input"
         />
       </motion.div>
+
+      <TypeFilter
+        selectedTypes={selectedTypes}
+        onTypeToggle={handleTypeToggle}
+        onClearFilters={handleClearFilters}
+      />
 
       {loading && (
         <motion.div

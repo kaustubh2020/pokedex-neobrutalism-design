@@ -37,3 +37,20 @@ export const getEvolutionChain = async (url) => {
     throw error;
   }
 };
+
+const moveCache = new Map();
+
+export const getMoveDetails = async (url) => {
+  if (moveCache.has(url)) {
+    return moveCache.get(url);
+  }
+
+  try {
+    const data = await fetchData(url);
+    moveCache.set(url, data);
+    return data;
+  } catch (error) {
+    console.error("Error fetching move details:", error);
+    throw error;
+  }
+};

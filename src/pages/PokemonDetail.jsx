@@ -5,6 +5,7 @@ import { typeColors } from '../utils/typeColors';
 import { getPokemonDetails } from '../utils/api';
 import Loading from '../components/ui/Loading';
 import EvolutionChain from '../components/pokemon/EvolutionChain';
+import PokemonMoves from '../components/pokemon/PokemonMoves';
 
 const PokemonDetail = () => {
   const { id } = useParams();
@@ -184,6 +185,7 @@ const PokemonDetail = () => {
         </div>
 
         <EvolutionChain pokemonId={pokemon.id} />
+        <PokemonMoves pokemon={pokemon} />
       </div>
     </motion.div>
   );
