@@ -22,6 +22,10 @@ const PokemonDetail = () => {
   const [isShiny, setIsShiny] = useState(false);
 
   useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [id]);
+
+  useEffect(() => {
     const fetchPokemon = async () => {
       setLoading(true);
       setError(null);

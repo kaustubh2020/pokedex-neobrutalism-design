@@ -1,9 +1,5 @@
-import { useState, useEffect, useCallback } from "react";
-import {
-  getPokemonDetails,
-  getPokemonSpecies,
-  getEvolutionChain,
-} from "../utils/api";
+import { useState, useEffect, useCallback, useRef } from "react";
+import { getPokemonDetails, getPokemonSpecies } from "../utils/api";
 import { pokemonList } from "../data/pokemonList";
 
 const BATCH_SIZE = 20;
@@ -14,6 +10,9 @@ export const usePokemon = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
+
+  // Track loaded IDs without including the pokemon array in useCallback deps
+  const loadedIds = useRef(new Set());
 
   const fetchBatch = useCallback(async () => {
     if (currentIndex >= pokemonList.length || isLoading) {
@@ -29,29 +28,19 @@ export const usePokemon = () => {
 
       const pokemonPromises = batch.map(async (item) => {
         const id = item.url.split("/")[6];
+        const numericId = parseInt(id);
 
-        // Check if already loaded
-        if (pokemon.some((p) => p.id === parseInt(id))) {
-          return null;
-        }
+        if (loadedIds.current.has(numericId)) return null;
 
         try {
-          // Fetch pokemon details
-          const details = await getPokemonDetails(id);
+          const [details, species] = await Promise.all([
+            getPokemonDetails(id),
+            getPokemonSpecies(id),
+          ]);
 
-          // Fetch species data
-          const species = await getPokemonSpecies(id);
+          loadedIds.current.add(numericId);
 
-          // Fetch evolution chain
-          const evolutionData = await getEvolutionChain(
-            species.evolution_chain.url
-          );
-
-          return {
-            ...details,
-            species,
-            evolutionChain: evolutionData,
-          };
+          return { ...details, species };
         } catch (err) {
           console.error(`Error fetching Pokemon ${id}:`, err);
           return null;
@@ -61,14 +50,7 @@ export const usePokemon = () => {
       const results = await Promise.all(pokemonPromises);
       const validResults = results.filter((p) => p !== null);
 
-      setPokemon((prev) => {
-        // Prevent duplicates
-        const newPokemon = validResults.filter(
-          (newP) => !prev.some((p) => p.id === newP.id)
-        );
-        return [...prev, ...newPokemon];
-      });
-
+      setPokemon((prev) => [...prev, ...validResults]);
       setCurrentIndex(endIndex);
       setHasMore(endIndex < pokemonList.length);
     } catch (err) {
@@ -77,9 +59,8 @@ export const usePokemon = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [currentIndex, pokemon, isLoading]);
+  }, [currentIndex, isLoading]);
 
-  // Load initial batch
   useEffect(() => {
     if (pokemon.length === 0 && !isLoading) {
       fetchBatch();

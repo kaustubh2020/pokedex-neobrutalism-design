@@ -13,12 +13,22 @@ const fetchData = async (url) => {
   }
 };
 
+const detailsCache = new Map();
+
 export const getPokemonDetails = async (id) => {
-  return await fetchData(`${BASE_URL}/pokemon/${id}`);
+  if (detailsCache.has(id)) return detailsCache.get(id);
+  const data = await fetchData(`${BASE_URL}/pokemon/${id}`);
+  detailsCache.set(id, data);
+  return data;
 };
 
+const speciesCache = new Map();
+
 export const getPokemonSpecies = async (id) => {
-  return await fetchData(`${BASE_URL}/pokemon-species/${id}`);
+  if (speciesCache.has(id)) return speciesCache.get(id);
+  const data = await fetchData(`${BASE_URL}/pokemon-species/${id}`);
+  speciesCache.set(id, data);
+  return data;
 };
 
 const evolutionCache = new Map();

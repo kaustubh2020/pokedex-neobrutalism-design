@@ -55,7 +55,7 @@ const PokemonCard = memo(({ pokemon }) => {
             transition={{ duration: 0.3 }}
           >
             <img
-              src={pokemon.sprites.other["official-artwork"].front_default}
+              src={pokemon.sprites?.other?.["official-artwork"]?.front_default}
               alt={pokemon.name}
               className="w-full h-48 object-contain"
             />

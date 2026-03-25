@@ -8,7 +8,7 @@ import { SkeletonGrid } from '../ui/SkeletonCard';
 import EmptyState from '../ui/EmptyState';
 
 const PokemonGrid = () => {
-  const { pokemon, loading, hasMore, loadMore } = usePokemon();
+  const { pokemon, loading, error, hasMore, loadMore } = usePokemon();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedTypes, setSelectedTypes] = useState([]);
 
@@ -39,6 +39,18 @@ const PokemonGrid = () => {
 
   const hasFilters = searchTerm || selectedTypes.length > 0;
   const showEmptyState = !loading && filteredPokemon.length === 0 && hasFilters;
+
+  if (error && pokemon.length === 0) {
+    return (
+      <div className="max-w-7xl mx-auto py-16 text-center">
+        <div className="neo-card p-8 bg-neo-pink inline-block">
+          <p className="text-5xl mb-4">⚠️</p>
+          <h2 className="text-2xl font-black uppercase mb-2">Failed to load Pokémon</h2>
+          <p className="text-gray-700">Check your connection and refresh the page.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-7xl mx-auto">
