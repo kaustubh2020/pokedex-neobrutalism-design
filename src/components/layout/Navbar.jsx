@@ -19,7 +19,6 @@ const Navbar = () => {
             to="/"
             className="text-2xl font-black uppercase hover:text-neo-blue transition-colors"
           >
-            <img src="" alt="" />
             Pokédex
           </Link>
 

@@ -84,7 +84,8 @@ export const usePokemon = () => {
     if (pokemon.length === 0 && !isLoading) {
       fetchBatch();
     }
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // intentional empty deps — initial load only
 
   const loadMore = useCallback(() => {
     if (!isLoading && hasMore) {

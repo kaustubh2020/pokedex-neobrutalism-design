@@ -17,15 +17,14 @@ const PokemonMoves = ({ pokemon }) => {
     const fetchMoves = async () => {
       setLoading(true);
       try {
-        const movePromises = pokemon.moves
-          .slice(0, 20)
-          .map(move => getMoveDetails(move.move.url));
+        const movesToFetch = pokemon.moves.slice(0, 60);
+        const movePromises = movesToFetch.map(move => getMoveDetails(move.move.url));
 
         const moveDetails = await Promise.all(movePromises);
 
         const movesWithMethod = moveDetails.map((detail, index) => ({
           ...detail,
-          learnMethods: pokemon.moves[index].version_group_details
+          learnMethods: movesToFetch[index].version_group_details
         }));
 
         setMoves(movesWithMethod);

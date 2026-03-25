@@ -1,4 +1,5 @@
 import { memo } from 'react';
+import PropTypes from 'prop-types';
 import { motion } from "motion/react";
 
 const SkeletonCard = memo(() => {
@@ -18,7 +19,7 @@ const SkeletonCard = memo(() => {
         <div className="my-4 border-4 border-gray-300 p-2 bg-gray-100 rounded-tl-xl">
           <div className="w-full h-48 bg-gray-300 rounded flex items-center justify-center">
             <span className="text-lg font-bold text-gray-600 text-center px-4">
-              Gotta Catch 'Em All!
+              Gotta Catch &apos;Em All!
             </span>
           </div>
         </div>
@@ -64,5 +65,9 @@ export const SkeletonGrid = memo(({ count = 8 }) => {
     </div>
   );
 });
+
+SkeletonGrid.propTypes = {
+  count: PropTypes.number,
+};
 
 SkeletonGrid.displayName = 'SkeletonGrid';

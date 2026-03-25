@@ -8,7 +8,7 @@ const ShareButton = memo(({ url, title, description }) => {
 
   const shareUrl = url || window.location.href;
   const shareTitle = title || document.title;
-  const shareText = description || '';
+  const shareText = description ? ` — ${description}` : '';
 
   const handleCopyLink = async () => {
     try {
@@ -31,7 +31,7 @@ const ShareButton = memo(({ url, title, description }) => {
       name: 'Twitter',
       icon: '𝕏',
       action: () => window.open(
-        `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareTitle)}&url=${encodeURIComponent(shareUrl)}`,
+        `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareTitle + shareText)}&url=${encodeURIComponent(shareUrl)}`,
         '_blank'
       ),
       color: 'bg-black text-white',

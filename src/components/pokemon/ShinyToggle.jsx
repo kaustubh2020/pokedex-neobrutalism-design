@@ -2,7 +2,7 @@ import { memo, useState } from 'react';
 import PropTypes from 'prop-types';
 import { motion, AnimatePresence } from "motion/react";
 
-const ShinyToggle = memo(({ normalSprite, shinySprite, pokemonName, onToggle }) => {
+const ShinyToggle = memo(({ shinySprite, pokemonName, onToggle }) => {
   const [isShiny, setIsShiny] = useState(false);
 
   const handleToggle = () => {
@@ -43,7 +43,6 @@ const ShinyToggle = memo(({ normalSprite, shinySprite, pokemonName, onToggle }) 
 });
 
 ShinyToggle.propTypes = {
-  normalSprite: PropTypes.string.isRequired,
   shinySprite: PropTypes.string,
   pokemonName: PropTypes.string.isRequired,
   onToggle: PropTypes.func,

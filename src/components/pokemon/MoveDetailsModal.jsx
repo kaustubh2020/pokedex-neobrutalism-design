@@ -1,4 +1,4 @@
-import { memo, useState } from 'react';
+import { memo } from 'react';
 import PropTypes from 'prop-types';
 import { motion, AnimatePresence } from "motion/react";
 import { typeColors } from '../../utils/typeColors';
@@ -115,8 +115,8 @@ const MoveDetailsModal = memo(({ move, isOpen, onClose }) => {
                 <div className="mt-4 neo-card p-4 bg-gray-50">
                   <h3 className="text-sm font-bold mb-2 uppercase">Description</h3>
                   <p className="text-sm italic">
-                    "{move.flavor_text_entries.find(e => e.language.name === 'en')?.flavor_text ||
-                      move.flavor_text_entries[0]?.flavor_text}"
+                    &ldquo;{move.flavor_text_entries.find(e => e.language.name === 'en')?.flavor_text ||
+                      move.flavor_text_entries[0]?.flavor_text}&rdquo;
                   </p>
                 </div>
               )}

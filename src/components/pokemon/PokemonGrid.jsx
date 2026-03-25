@@ -90,14 +90,14 @@ const PokemonGrid = () => {
               className="text-center py-8"
             >
               <p className="text-xl font-bold">
-                🎉 You've seen all {filteredPokemon.length} Pokémon!
+                🎉 You&apos;ve seen all {filteredPokemon.length} Pokémon!
               </p>
             </motion.div>
           }
         >
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 mt-8">
             <AnimatePresence>
-              {filteredPokemon.map((pokemon, index) => (
+              {filteredPokemon.map((pokemon) => (
                 <motion.div
                   key={`pokemon-${pokemon.id}`}
                   initial={{ opacity: 0, y: 50 }}

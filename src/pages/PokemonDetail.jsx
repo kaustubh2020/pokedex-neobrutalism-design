@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from "motion/react";
 import { typeColors } from '../utils/typeColors';
-import { getPokemonDetails } from '../utils/api';
+import { getPokemonDetails, getPokemonSpecies } from '../utils/api';
 import Loading from '../components/ui/Loading';
 import ShareButton from '../components/ui/ShareButton';
 import EvolutionChain from '../components/pokemon/EvolutionChain';
@@ -10,21 +10,31 @@ import PokemonMoves from '../components/pokemon/PokemonMoves';
 import TypeEffectiveness from '../components/pokemon/TypeEffectiveness';
 import PokemonDescription from '../components/pokemon/PokemonDescription';
 import ShinyToggle, { ShinySprite } from '../components/pokemon/ShinyToggle';
+import CatchRateDisplay from '../components/pokemon/CatchRateDisplay';
 
 const PokemonDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [pokemon, setPokemon] = useState(null);
+  const [species, setSpecies] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [isShiny, setIsShiny] = useState(false);
 
   useEffect(() => {
     const fetchPokemon = async () => {
+      setLoading(true);
+      setError(null);
       try {
-        const data = await getPokemonDetails(id);
+        const [data, speciesData] = await Promise.all([
+          getPokemonDetails(id),
+          getPokemonSpecies(id),
+        ]);
         setPokemon(data);
-      } catch (error) {
-        console.error('Error fetching pokemon:', error);
+        setSpecies(speciesData);
+      } catch (err) {
+        console.error('Error fetching pokemon:', err);
+        setError('Pokémon not found. It may not exist or failed to load.');
       } finally {
         setLoading(false);
       }
@@ -33,11 +43,34 @@ const PokemonDetail = () => {
     fetchPokemon();
   }, [id]);
 
-  if (loading || !pokemon) return <Loading />;
+  if (loading) return <Loading />;
 
-  const mainType = pokemon.types[0].type.name;
-  const colors = typeColors[mainType];
+  if (error || !pokemon) {
+    return (
+      <div className="max-w-4xl mx-auto px-4 py-8">
+        <div className="neo-card p-8 bg-neo-pink text-center">
+          <p className="text-6xl mb-4">⚠️</p>
+          <h2 className="text-3xl font-black uppercase mb-3">Pokémon Not Found</h2>
+          <p className="mb-6 text-gray-700">{error || 'Something went wrong.'}</p>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => navigate('/')}
+            className="neo-button"
+          >
+            ← Back to List
+          </motion.button>
+        </div>
+      </div>
+    );
+  }
+
+  const mainType = pokemon.types?.[0]?.type?.name ?? 'normal';
+  const colors = typeColors[mainType] ?? typeColors['normal'];
   const pokemonTypes = pokemon.types.map(t => t.type.name);
+
+  const normalSprite = pokemon.sprites?.other?.['official-artwork']?.front_default;
+  const shinySprite = pokemon.sprites?.other?.['official-artwork']?.front_shiny;
 
   return (
     <motion.div
@@ -68,8 +101,8 @@ const PokemonDetail = () => {
           <div>
             <div className="neo-card p-4 bg-neo-white rounded-tl-3xl">
               <ShinySprite
-                normalSprite={pokemon.sprites.other['official-artwork'].front_default}
-                shinySprite={pokemon.sprites.other['official-artwork'].front_shiny}
+                normalSprite={normalSprite}
+                shinySprite={shinySprite}
                 isShiny={isShiny}
                 pokemonName={pokemon.name}
               />
@@ -77,12 +110,14 @@ const PokemonDetail = () => {
 
             <div className="mt-4 flex justify-center">
               <ShinyToggle
-                normalSprite={pokemon.sprites.other['official-artwork'].front_default}
-                shinySprite={pokemon.sprites.other['official-artwork'].front_shiny}
+                normalSprite={normalSprite}
+                shinySprite={shinySprite}
                 pokemonName={pokemon.name}
                 onToggle={setIsShiny}
               />
             </div>
+
+            <CatchRateDisplay species={species} baseExperience={pokemon.base_experience} />
           </div>
 
           <div className="space-y-6">
@@ -114,7 +149,7 @@ const PokemonDetail = () => {
                     animate={{ x: 0, opacity: 1 }}
                     transition={{ delay: index * 0.2 }}
                     className="px-4 py-2 border-2 border-neo-black font-bold uppercase"
-                    style={{ backgroundColor: typeColors[type.name].bg }}
+                    style={{ backgroundColor: typeColors[type.name]?.bg }}
                   >
                     {type.name}
                   </motion.span>
@@ -205,7 +240,7 @@ const PokemonDetail = () => {
           </div>
         </div>
 
-        <PokemonDescription species={pokemon.species} />
+        <PokemonDescription species={species} />
         <TypeEffectiveness types={pokemonTypes} />
         <EvolutionChain pokemonId={pokemon.id} />
         <PokemonMoves pokemon={pokemon} />

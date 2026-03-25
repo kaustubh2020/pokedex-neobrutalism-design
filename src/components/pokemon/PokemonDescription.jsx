@@ -40,7 +40,7 @@ const PokemonDescription = memo(({ species }) => {
       )}
 
       <p className="text-base leading-relaxed">
-        "{description}"
+        &ldquo;{description}&rdquo;
       </p>
 
       {latestEntry.version && (

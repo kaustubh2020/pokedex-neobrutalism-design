@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find /e/Workspace/pokedex-neobrutalism-design-1 -maxdepth 2 -not -path */node_modules* -type d)"
+    ]
+  }
+}
