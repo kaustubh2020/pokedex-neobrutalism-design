@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { motion } from "motion/react";
 import { Link } from "react-router-dom";
 import { typeColors } from "../../utils/typeColors";
+import Pokeball from "../ui/Pokeball";
 
 const PokemonCard = memo(({ pokemon }) => {
   const mainType = pokemon.types[0].type.name;
@@ -35,11 +36,11 @@ const PokemonCard = memo(({ pokemon }) => {
     >
       <Link to={`/pokemon/${pokemon.id}`}>
         <div className="p-4">
-          <div className="flex justify-between items-center border-b-4 border-neo-black pb-2">
-            <h2 className="text-xl font-black uppercase">
+          <div className="flex justify-between items-center gap-2 border-b-4 border-neo-black pb-2">
+            <h2 className="font-display text-lg uppercase truncate">
               {pokemon.name}
             </h2>
-            <span className="font-bold">
+            <span className="font-mono font-bold bg-neo-black text-neo-white px-1.5 py-0.5 text-sm">
               #{String(pokemon.id).padStart(3, "0")}
             </span>
           </div>
@@ -50,21 +51,24 @@ const PokemonCard = memo(({ pokemon }) => {
           </div>
 
           <motion.div
-            className="my-4 border-4 border-neo-black p-2 bg-neo-white rounded-tl-xl relative"
+            className="my-4 border-4 border-neo-black p-2 bg-neo-white rounded-tl-xl relative overflow-hidden"
             whileHover={{ scale: 1.03 }}
             transition={{ duration: 0.3 }}
           >
+            <Pokeball className="absolute -bottom-6 -right-6 w-28 h-28 opacity-10" />
             <img
               src={pokemon.sprites?.other?.["official-artwork"]?.front_default}
               alt={pokemon.name}
-              className="w-full h-48 object-contain"
+              loading="lazy"
+              onLoad={(e) => e.target.classList.add('loaded')}
+              className="w-full h-48 object-contain relative"
             />
 
             {/* Highest Stat Badge */}
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
-              className="absolute top-2 right-2 border-2 border-neo-black px-2 py-1 text-xs font-bold shadow-neo"
+              className="absolute top-2 right-2 bg-neo-yellow border-2 border-neo-black px-2 py-1 text-xs font-bold shadow-neo-sm"
             >
               {statIcons[highestStat.stat.name]} {highestStat.base_stat}
             </motion.div>

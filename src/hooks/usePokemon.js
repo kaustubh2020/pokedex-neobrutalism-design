@@ -13,13 +13,18 @@ export const usePokemon = () => {
 
   // Track loaded IDs without including the pokemon array in useCallback deps
   const loadedIds = useRef(new Set());
+  // Synchronous in-flight guard — isLoading state updates too late to stop
+  // concurrent calls (e.g. StrictMode double-invoking the initial effect)
+  const isFetching = useRef(false);
 
   const fetchBatch = useCallback(async () => {
-    if (currentIndex >= pokemonList.length || isLoading) {
+    if (isFetching.current) return;
+    if (currentIndex >= pokemonList.length) {
       setHasMore(false);
       return;
     }
 
+    isFetching.current = true;
     setIsLoading(true);
 
     try {
@@ -57,9 +62,10 @@ export const usePokemon = () => {
       setError(err);
       console.error("Error fetching Pokemon batch:", err);
     } finally {
+      isFetching.current = false;
       setIsLoading(false);
     }
-  }, [currentIndex, isLoading]);
+  }, [currentIndex]);
 
   useEffect(() => {
     if (pokemon.length === 0 && !isLoading) {

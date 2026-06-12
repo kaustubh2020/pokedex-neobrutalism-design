@@ -2,25 +2,91 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer components {
-  .neo-button {
-    @apply px-4 py-2 bg-neo-blue text-neo-white border-2 border-neo-black 
-           shadow-neo hover:shadow-neo-lg transition-all duration-200;
+@layer base {
+  body {
+    @apply bg-neo-cream text-neo-black font-body min-h-screen;
+    background-image: radial-gradient(rgba(22, 22, 26, 0.12) 1.5px, transparent 1.5px);
+    background-size: 22px 22px;
   }
 
-  .neo-input {
-    @apply w-full p-4 border-4 border-neo-black shadow-neo 
-           focus:outline-none focus:shadow-neo-lg transition-all duration-200;
+  h1,
+  h2,
+  h3 {
+    @apply font-display;
   }
 
-  .neo-card {
-    @apply bg-neo-white border-4 border-neo-black shadow-neo 
-           hover:shadow-neo-lg transition-all duration-200;
+  ::selection {
+    @apply bg-neo-yellow text-neo-black;
+  }
+
+  ::-webkit-scrollbar {
+    width: 14px;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-neo-cream border-l-2 border-neo-black;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-neo-red border-2 border-neo-black;
   }
 }
 
-body {
-  @apply bg-neo-yellow min-h-screen;
+@layer components {
+  .neo-button {
+    @apply px-4 py-2 bg-neo-blue text-neo-white font-bold uppercase border-2 border-neo-black
+           shadow-neo hover:shadow-neo-lg hover:-translate-x-0.5 hover:-translate-y-0.5
+           active:shadow-none active:translate-x-1 active:translate-y-1
+           transition-all duration-150;
+  }
+
+  .neo-input {
+    @apply w-full p-4 border-4 border-neo-black shadow-neo bg-neo-white font-bold
+           placeholder:font-medium placeholder:text-neo-black/50
+           focus:outline-none focus:shadow-neo-lg focus:-translate-y-0.5 transition-all duration-150;
+  }
+
+  .neo-card {
+    @apply bg-neo-white border-4 border-neo-black shadow-neo
+           hover:shadow-neo-lg transition-all duration-200;
+  }
+
+  .neo-sticker {
+    @apply inline-block border-2 border-neo-black px-3 py-1 font-bold uppercase shadow-neo-sm;
+  }
+}
+
+/* ---- Arcade helpers ---- */
+.perspective-600 {
+  perspective: 600px;
+}
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+.backface-hidden {
+  backface-visibility: hidden;
+}
+.rotate-y-180 {
+  transform: rotateY(180deg);
+}
+
+.arena-stripes {
+  background-image: repeating-linear-gradient(
+    45deg,
+    rgba(255, 222, 0, 0.07) 0 16px,
+    transparent 16px 32px
+  );
+  animation: stripes-move 2.5s linear infinite;
+}
+@keyframes stripes-move {
+  to {
+    background-position: 45px 45px;
+  }
+}
+
+.winner-card {
+  @apply ring-4 ring-neo-green scale-105;
+}
+.loser-card {
+  @apply grayscale opacity-60 scale-95;
 }
 
 /* Focus Indicators for Accessibility */
@@ -56,4 +122,3 @@ img[loading="lazy"].loaded,
 img[loading="lazy"]:not([src]) {
   opacity: 1;
 }
-
