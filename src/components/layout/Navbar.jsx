@@ -1,49 +1,67 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
+import Pokeball from "../ui/Pokeball";
+
+const NAV_LINKS = [
+  { name: 'Pokédex', to: '/', icon: '📖' },
+  { name: 'Arcade', to: '/arcade', icon: '🕹️' },
+];
+
+const SOCIAL_LINKS = [
+  { name: 'GitHub', url: 'https://github.com/kaustubh2020/pokedex-neobrutalism-design', icon: '💻' },
+  { name: 'Portfolio', url: 'https://kaustubh-folio.netlify.app/', icon: '👑' },
+];
+
+const navChipClass = ({ isActive }) =>
+  `neo-sticker transition-colors ${
+    isActive ? 'bg-neo-black text-neo-yellow' : 'bg-neo-white hover:bg-neo-pink'
+  }`;
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const socialLinks = [
-    { name: 'GitHub', url: 'https://github.com/kaustubh2020/pokedex-neobrutalism-design', icon: '💻' },
-    { name: 'Portfolio', url: 'https://kaustubh-folio.netlify.app/', icon: '👑' },
-  ];
-
   return (
-    <nav className="bg-neo-white border-b-4 border-neo-black sticky top-0 z-50">
+    <nav className="bg-neo-yellow border-b-4 border-neo-black sticky top-0 z-50 shadow-neo">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <Link
-            to="/"
-            className="text-2xl font-black uppercase hover:text-neo-blue transition-colors"
-          >
-            Pokédex
+          <Link to="/" className="flex items-center gap-2 group shrink-0">
+            <Pokeball className="w-9 h-9 transition-transform duration-300 group-hover:rotate-180" />
+            <span className="font-display text-xl md:text-2xl uppercase">Pokédex</span>
           </Link>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-4">
-            {socialLinks.map((link) => (
+          {/* Desktop: nav links + icon-only socials */}
+          <div className="hidden md:flex items-center gap-3">
+            {NAV_LINKS.map((link) => (
+              <NavLink key={link.to} to={link.to} end={link.to === '/'} className={navChipClass}>
+                <span className="mr-1">{link.icon}</span>
+                {link.name}
+              </NavLink>
+            ))}
+
+            <span className="w-1 h-8 bg-neo-black mx-1" aria-hidden="true" />
+
+            {SOCIAL_LINKS.map((link) => (
               <a
                 key={link.name}
                 href={link.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-3 py-1 hover:bg-neo-yellow border-2 border-transparent
-                         hover:border-neo-black transition-all duration-200 rounded-md"
+                title={link.name}
+                aria-label={link.name}
+                className="neo-sticker bg-neo-white hover:bg-neo-blue text-base px-2"
               >
-                <span className="mr-2">{link.icon}</span>
-                {link.name}
+                {link.icon}
               </a>
             ))}
-            <span className="text-sm px-2 py-1 bg-neo-pink border-2 border-neo-black rounded-md text-neo-black">Made with 💛 by Kaustubh Jaiswal</span>
           </div>
 
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="md:hidden p-2 hover:bg-neo-yellow rounded-md"
+            aria-label="Toggle menu"
+            className="md:hidden neo-sticker bg-neo-white text-lg leading-none"
           >
             {isMenuOpen ? '✕' : '☰'}
           </button>
@@ -56,30 +74,43 @@ const Navbar = () => {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="md:hidden border-t-2 border-neo-black"
+              className="md:hidden border-t-2 border-neo-black overflow-hidden"
             >
               <div className="py-4 space-y-2">
-                {socialLinks.map((link) => (
+                {NAV_LINKS.map((link) => (
+                  <NavLink
+                    key={link.to}
+                    to={link.to}
+                    end={link.to === '/'}
+                    onClick={() => setIsMenuOpen(false)}
+                    className={({ isActive }) =>
+                      `block px-4 py-2 font-bold transition-colors ${
+                        isActive ? 'bg-neo-black text-neo-yellow' : 'hover:bg-neo-white'
+                      }`
+                    }
+                  >
+                    <span className="mr-2">{link.icon}</span>
+                    {link.name}
+                  </NavLink>
+                ))}
+                {SOCIAL_LINKS.map((link) => (
                   <a
                     key={link.name}
                     href={link.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="block px-4 py-2 hover:bg-neo-yellow transition-colors"
+                    className="block px-4 py-2 font-bold hover:bg-neo-white transition-colors"
                   >
                     <span className="mr-2">{link.icon}</span>
                     {link.name}
                   </a>
                 ))}
-                <div className="px-4 py-2 text-sm text-center bg-neo-pink border-2 border-neo-black rounded-md">
-                  Made with 💛 by Kaustubh Jaiswal
-                </div>
               </div>
             </motion.div>
           )}
         </AnimatePresence>
-      </div >
-    </nav >
+      </div>
+    </nav>
   );
 };
 

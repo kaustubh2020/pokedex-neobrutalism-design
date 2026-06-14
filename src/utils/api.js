@@ -48,6 +48,22 @@ export const getEvolutionChain = async (url) => {
   }
 };
 
+const typeCache = new Map();
+
+// Returns a Set of national-dex IDs belonging to a type (e.g. "fire").
+// Lets filters search the FULL Pokédex instead of only already-loaded Pokémon.
+export const getPokemonIdsByType = async (type) => {
+  if (typeCache.has(type)) return typeCache.get(type);
+  const data = await fetchData(`${BASE_URL}/type/${type}`);
+  const ids = new Set(
+    data.pokemon
+      .map((p) => parseInt(p.pokemon.url.split("/")[6]))
+      .filter((id) => !Number.isNaN(id))
+  );
+  typeCache.set(type, ids);
+  return ids;
+};
+
 const moveCache = new Map();
 
 export const getMoveDetails = async (url) => {

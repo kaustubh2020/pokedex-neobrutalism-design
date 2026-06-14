@@ -130,7 +130,7 @@ const PokemonDetail = () => {
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ delay: 0.2 }}
-                className="text-4xl font-black uppercase"
+                className="text-3xl md:text-4xl uppercase [text-shadow:3px_3px_0_rgba(255,255,255,0.6)]"
               >
                 {pokemon.name}
               </motion.h1>
@@ -199,7 +199,7 @@ const PokemonDetail = () => {
                         className="space-y-1"
                       >
                         <div className="flex justify-between">
-                          <span className="capitalize">{stat.stat.name}</span>
+                          <span className="capitalize font-bold">{stat.stat.name.replace(/-/g, ' ')}</span>
                           <span>{stat.base_stat}</span>
                         </div>
                         <div className="h-4 bg-neo-white border-2 border-neo-black">
